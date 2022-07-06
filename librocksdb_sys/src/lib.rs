@@ -1197,13 +1197,6 @@ extern "C" {
         batch: *mut DBWriteBatch,
         err: *mut *mut c_char,
     );
-    pub fn crocksdb_write_multi_batch(
-        db: *mut DBInstance,
-        writeopts: *const DBWriteOptions,
-        batch: *const *mut DBWriteBatch,
-        batchlen: size_t,
-        err: *mut *mut c_char,
-    );
     pub fn crocksdb_writebatch_create() -> *mut DBWriteBatch;
     pub fn crocksdb_writebatch_create_with_capacity(cap: size_t) -> *mut DBWriteBatch;
     pub fn crocksdb_writebatch_create_from(rep: *const u8, size: size_t) -> *mut DBWriteBatch;
@@ -1320,11 +1313,6 @@ extern "C" {
     );
     pub fn crocksdb_writebatch_set_content(batch: *mut DBWriteBatch, data: *const u8, dlen: size_t);
 
-    pub fn crocksdb_writebatch_append_content(
-        dest: *mut DBWriteBatch,
-        data: *const u8,
-        dlen: size_t,
-    );
     pub fn crocksdb_writebatch_ref_count(data: *const u8, dlen: size_t) -> c_int;
     pub fn crocksdb_writebatch_ref_iterator_create(
         data: *const u8,

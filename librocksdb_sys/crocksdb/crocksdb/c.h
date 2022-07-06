@@ -384,9 +384,9 @@ extern C_ROCKSDB_LIBRARY_API void crocksdb_write(
     crocksdb_t* db, const crocksdb_writeoptions_t* options,
     crocksdb_writebatch_t* batch, char** errptr);
 
-extern C_ROCKSDB_LIBRARY_API void crocksdb_write_multi_batch(
+/* TODO(bhx): extern C_ROCKSDB_LIBRARY_API void crocksdb_write_multi_batch(
     crocksdb_t* db, const crocksdb_writeoptions_t* options,
-    crocksdb_writebatch_t** batches, size_t batch_size, char** errptr);
+    crocksdb_writebatch_t** batches, size_t batch_size, char** errptr); */
 
 /* Returns NULL if not found.  A malloc()ed array otherwise.
    Stores the length of the array in *vallen. */
@@ -693,8 +693,9 @@ extern C_ROCKSDB_LIBRARY_API void crocksdb_writebatch_rollback_to_save_point(
     crocksdb_writebatch_t*, char** errptr);
 extern C_ROCKSDB_LIBRARY_API void crocksdb_writebatch_set_content(
     crocksdb_writebatch_t* b, const char* data, size_t dlen);
-extern C_ROCKSDB_LIBRARY_API void crocksdb_writebatch_append_content(
-    crocksdb_writebatch_t* dest, const char* data, size_t dlen);
+//TODO(bhx)
+/*extern C_ROCKSDB_LIBRARY_API void crocksdb_writebatch_append_content(
+    crocksdb_writebatch_t* dest, const char* data, size_t dlen);*/
 extern C_ROCKSDB_LIBRARY_API int crocksdb_writebatch_ref_count(const char* data,
                                                                size_t dlen);
 extern C_ROCKSDB_LIBRARY_API crocksdb_writebatch_iterator_t*

@@ -94,16 +94,6 @@ impl WriteBatch {
         }
     }
 
-    pub fn append(&mut self, src: &[u8]) {
-        unsafe {
-            crocksdb_ffi::crocksdb_writebatch_append_content(
-                self.inner,
-                src.as_ptr(),
-                src.len() as size_t,
-            );
-        }
-    }
-
     pub fn iterate<F>(&self, cfs: &[&str], mut iterator_fn: F)
     where
         F: FnMut(&str, DBValueType, &[u8], Option<&[u8]>),
