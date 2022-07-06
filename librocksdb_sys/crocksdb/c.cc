@@ -139,7 +139,7 @@ using rocksdb::SstFileWriter;
 using rocksdb::SstPartitioner;
 using rocksdb::SstPartitionerFactory;
 using rocksdb::Status;
-//TODO(bhx): using rocksdb::SubcompactionJobInfo;
+using rocksdb::SubcompactionJobInfo;
 using rocksdb::TableFileCreationReason;
 using rocksdb::TableProperties;
 using rocksdb::TablePropertiesCollection;
@@ -356,7 +356,7 @@ struct crocksdb_compactionjobinfo_t {
   CompactionJobInfo rep;
 };
 struct crocksdb_subcompactionjobinfo_t {
-  //TODO(bhx): SubcompactionJobInfo rep;
+  SubcompactionJobInfo rep;
 };
 struct crocksdb_externalfileingestioninfo_t {
   ExternalFileIngestionInfo rep;
@@ -2191,31 +2191,28 @@ CompactionReason crocksdb_compactionjobinfo_compaction_reason(
 
 void crocksdb_subcompactionjobinfo_status(
     const crocksdb_subcompactionjobinfo_t* info, char** errptr) {
-  assert(false); //TODO(bhx)
+  SaveError(errptr, info->rep.status);
 }
 
 const char* crocksdb_subcompactionjobinfo_cf_name(
     const crocksdb_subcompactionjobinfo_t* info, size_t* size) {
-  assert(false); //TODO(bhx)
-  return nullptr;
+  *size = info->rep.cf_name.size();
+  return info->rep.cf_name.data();
 }
 
 uint64_t crocksdb_subcompactionjobinfo_thread_id(
     const crocksdb_subcompactionjobinfo_t* info) {
-  assert(false); //TODO(bhx)
-  return 0;
+  return info->rep.thread_id;
 }
 
 int crocksdb_subcompactionjobinfo_base_input_level(
     const crocksdb_subcompactionjobinfo_t* info) {
-  assert(false); //TODO(bhx)
-  return 0;
+  return info->rep.base_input_level;
 }
 
 int crocksdb_subcompactionjobinfo_output_level(
     const crocksdb_subcompactionjobinfo_t* info) {
-  assert(false); //TODO(bhx)
-  return 0;
+  return info->rep.output_level;
 }
 
 /* ExternalFileIngestionInfo */
@@ -2309,6 +2306,18 @@ struct crocksdb_eventlistener_t : public EventListener {
     on_compaction_completed(
         state_, &c_db,
         reinterpret_cast<const crocksdb_compactionjobinfo_t*>(&info));
+  }
+
+  virtual void OnSubcompactionBegin(const SubcompactionJobInfo& info) {
+    on_subcompaction_begin(
+        state_,
+        reinterpret_cast<const crocksdb_subcompactionjobinfo_t*>(&info));
+  }
+
+  virtual void OnSubcompactionCompleted(const SubcompactionJobInfo& info) {
+    on_subcompaction_completed(
+        state_,
+        reinterpret_cast<const crocksdb_subcompactionjobinfo_t*>(&info));
   }
 
   virtual void OnExternalFileIngested(DB* db,
