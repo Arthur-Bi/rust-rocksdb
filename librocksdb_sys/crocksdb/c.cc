@@ -2890,8 +2890,9 @@ void crocksdb_options_set_enable_multi_batch_write(crocksdb_options_t* opt,
 
 unsigned char crocksdb_options_is_enable_multi_batch_write(
     crocksdb_options_t* opt) {
-  assert(false); // TODO(bhx): return opt->rep.enable_multi_batch_write;
-  return 'c';
+  // we donnot support enable_multi_batch_write;
+  const bool enable_multi_batch_write = false;
+  return enable_multi_batch_write;
 }
 
 void crocksdb_options_set_unordered_write(crocksdb_options_t* opt,
@@ -3062,13 +3063,14 @@ int crocksdb_options_get_disable_auto_compactions(
 
 void crocksdb_options_set_disable_write_stall(crocksdb_options_t* opt,
                                               unsigned char disable) {
-  assert(false); // TODO(bhx): opt->rep.disable_write_stall = disable;
+  assert(!disable); // TODO(bhx): opt->rep.disable_write_stall = disable;
 }
 
 unsigned char crocksdb_options_get_disable_write_stall(
     const crocksdb_options_t* opt) {
-  assert(false); // TODO(bhx): return opt->rep.disable_write_stall;
-  return 'c';
+  // TODO(bhx): return opt->rep.disable_write_stall;
+  bool disable_write_stall = false;
+  return disable_write_stall;
 }
 
 void crocksdb_options_set_delete_obsolete_files_period_micros(
@@ -3351,7 +3353,8 @@ void crocksdb_ratelimiter_set_bytes_per_second(crocksdb_ratelimiter_t* limiter,
 
 void crocksdb_ratelimiter_set_auto_tuned(crocksdb_ratelimiter_t* limiter,
                                          unsigned char auto_tuned) {
-  assert(false); //TODO(bhx): limiter->rep->SetAutoTuned(auto_tuned);
+  bool b_auto_tuned = auto_tuned;
+  assert(!b_auto_tuned); //TODO(bhx): limiter->rep->SetAutoTuned(auto_tuned);
 }
 
 int64_t crocksdb_ratelimiter_get_singleburst_bytes(
@@ -3376,8 +3379,8 @@ int64_t crocksdb_ratelimiter_get_bytes_per_second(
 
 unsigned char crocksdb_ratelimiter_get_auto_tuned(
     crocksdb_ratelimiter_t* limiter) {
-  assert(false); //TODO(bhx): return limiter->rep->GetAutoTuned();
-  return 'c';
+  bool b_auto_tuned = false; //TODO(bhx): return limiter->rep->GetAutoTuned();
+  return b_auto_tuned;
 }
 
 int64_t crocksdb_ratelimiter_get_total_requests(crocksdb_ratelimiter_t* limiter,
@@ -4251,7 +4254,6 @@ crocksdb_env_t* crocksdb_key_managed_encrypted_env_create(
   return result;
 }
 #endif
-/* TODO(bhx)
 struct crocksdb_file_system_inspector_impl_t : public FileSystemInspector {
   void* state;
   void (*destructor)(void*);
@@ -5525,14 +5527,12 @@ crocksdb_perf_flags_t* crocksdb_create_perf_flags() {
 
 void crocksdb_perf_flags_set(crocksdb_perf_flags_t* flags, uint32_t flag) {
   // TODO(bhx): flags->rep.set(flag);
-  assert(false);
 }
 
 void crocksdb_destroy_perf_flags(crocksdb_perf_flags_t* flags) { delete flags; }
 
 void crocksdb_set_perf_flags(const crocksdb_perf_flags_t* flags) {
   // TODO(bhx): rocksdb::SetPerfFlags(flags->rep);
-  assert(false);
 }
 
 struct crocksdb_perf_context_t {
