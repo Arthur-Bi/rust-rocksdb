@@ -24,6 +24,7 @@
 #include "rocksdb/db.h"
 #include "rocksdb/env.h"
 #include "rocksdb/env_encryption.h"
+#include "rocksdb/env_inspected.h"
 #include "rocksdb/file_system.h"
 #include "rocksdb/filter_policy.h"
 #include "rocksdb/iostats_context.h"
@@ -187,6 +188,9 @@ using rocksdb::encryption::FileEncryptionInfo;
 using rocksdb::encryption::KeyManager;
 using rocksdb::encryption::NewKeyManagedEncryptedEnv;
 #endif
+
+using rocksdb::FileSystemInspector;
+using rocksdb::NewFileSystemInspectedEnv;
 
 using std::shared_ptr;
 
@@ -668,7 +672,7 @@ struct crocksdb_sst_partitioner_factory_t {
 };
 
 struct crocksdb_file_system_inspector_t {
-  // TODO(bhx): std::shared_ptr<FileSystemInspector> rep;
+  std::shared_ptr<FileSystemInspector> rep;
 };
 
 static bool SaveError(char** errptr, const Status& s) {
@@ -4254,6 +4258,7 @@ crocksdb_env_t* crocksdb_key_managed_encrypted_env_create(
   return result;
 }
 #endif
+
 struct crocksdb_file_system_inspector_impl_t : public FileSystemInspector {
   void* state;
   void (*destructor)(void*);
@@ -4290,37 +4295,54 @@ struct crocksdb_file_system_inspector_impl_t : public FileSystemInspector {
     }
   }
 };
-*/
 
 crocksdb_file_system_inspector_t* crocksdb_file_system_inspector_create(
     void* state, void (*destructor)(void*),
     crocksdb_file_system_inspector_read_cb read,
     crocksdb_file_system_inspector_write_cb write) {
-  assert(false);  // Markdown titan
-  return nullptr;
+  std::shared_ptr<crocksdb_file_system_inspector_impl_t> inspector_impl =
+      std::make_shared<crocksdb_file_system_inspector_impl_t>();
+  inspector_impl->state = state;
+  inspector_impl->destructor = destructor;
+  inspector_impl->read = read;
+  inspector_impl->write = write;
+  crocksdb_file_system_inspector_t* inspector =
+      new crocksdb_file_system_inspector_t;
+  inspector->rep = inspector_impl;
+  return inspector;
 }
 
 void crocksdb_file_system_inspector_destroy(
     crocksdb_file_system_inspector_t* inspector) {
-  assert(false);  // Markdown titan
+  delete inspector;
 }
 
 size_t crocksdb_file_system_inspector_read(
     crocksdb_file_system_inspector_t* inspector, size_t len, char** errptr) {
-  assert(false);  // Markdown titan
-  return 0;
+  assert(inspector != nullptr && inspector->rep != nullptr);
+  size_t allowed = 0;
+  SaveError(errptr, inspector->rep->Read(len, &allowed));
+  return allowed;
 }
 
 size_t crocksdb_file_system_inspector_write(
     crocksdb_file_system_inspector_t* inspector, size_t len, char** errptr) {
-  assert(false);  // Markdown titan
-  return 0;
+  assert(inspector != nullptr && inspector->rep != nullptr);
+  size_t allowed = 0;
+  SaveError(errptr, inspector->rep->Write(len, &allowed));
+  return allowed;
 }
 
 crocksdb_env_t* crocksdb_file_system_inspected_env_create(
     crocksdb_env_t* base_env, crocksdb_file_system_inspector_t* inspector) {
-  assert(false);  // Markdown titan
-  return nullptr;
+  assert(base_env != nullptr);
+  assert(inspector != nullptr);
+  crocksdb_env_t* result = new crocksdb_env_t;
+  result->rep = NewFileSystemInspectedEnv(base_env->rep, inspector->rep);
+  result->block_cipher = nullptr;
+  result->encryption_provider = nullptr;
+  result->is_default = false;
+  return result;
 }
 
 crocksdb_sstfilereader_t* crocksdb_sstfilereader_create(
